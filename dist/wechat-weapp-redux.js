@@ -172,9 +172,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _shallowEqual = __webpack_require__(5);
+	var _shallowEqualAndDiff = __webpack_require__(5);
 
-	var _shallowEqual2 = _interopRequireDefault(_shallowEqual);
+	var _shallowEqualAndDiff2 = _interopRequireDefault(_shallowEqualAndDiff);
 
 	var _warning = __webpack_require__(2);
 
@@ -218,10 +218,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var state = this.store.getState();
 	      var mappedState = mapState.bind(this)(state, options);
-	      if (!this.data || (0, _shallowEqual2.default)(this.data, mappedState)) {
+	      var shallowEqualRes = (0, _shallowEqualAndDiff2.default)(mappedState, this.data);
+	      if (!this.data || shallowEqualRes.equal) {
 	        return;
 	      }
-	      this.setData(mappedState);
+	      this.setData(shallowEqualRes.diff);
 	    }
 
 	    var _onLoad = pageConfig.onLoad,
@@ -273,15 +274,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	  }
 
+	  var equal = true;
+	  var diffAByB = {};
 	  // Test for A's keys different from B.
 	  var hasOwn = Object.prototype.hasOwnProperty;
 	  for (var i = 0; i < keysA.length; i++) {
-	    if (!hasOwn.call(objB, keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
-	      return false;
+	    var keyA = keysA[i];
+	    if (!hasOwn.call(objB, keyA) || objA[keyA] !== objB[keyA]) {
+	      diffAByB[keyA] = objA[keyA];
+	      equal = false;
 	    }
 	  }
 
-	  return true;
+	  return {
+	    equal: equal,
+	    diff: diffAByB
+	  };
 	}
 
 	module.exports = shallowEqual;
